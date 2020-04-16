@@ -2,6 +2,7 @@ import json
 import urllib
 
 import boto3
+from botocore.exceptions import ClientError
 
 
 def handler(event, context):
@@ -34,5 +35,5 @@ def handler(event, context):
     try:
         response = elastic_transcoder.create_job(**transcoder_params)
         return json.dumps({"message": response})
-    except Exception as exc:
+    except ClientError as exc:
         return json.dumps({"error": str(exc)})
