@@ -1,5 +1,3 @@
-
-
 resource "aws_elastictranscoder_pipeline" "transcoder" {
   input_bucket = var.buckets_mapper.input
   name         = "transcoder_pipeline"
