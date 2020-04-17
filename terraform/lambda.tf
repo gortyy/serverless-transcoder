@@ -18,13 +18,13 @@ resource "aws_lambda_function" "set_permissions" {
 }
 
 resource "aws_s3_bucket_object" "transcode_lambda_zip" {
-  bucket = var.buckets_mapper.lambda_functions
+  bucket = aws_s3_bucket.bucket.2.bucket
   key    = join("/", [var.transcode_video_lambda_name, "1.0.0", basename("./${var.transcode_video_lambda_name}.zip")])
   source = "./${var.transcode_video_lambda_name}.zip"
 }
 
 resource "aws_s3_bucket_object" "set_permissions_lambda_zip" {
-  bucket = var.buckets_mapper.lambda_functions
+  bucket = aws_s3_bucket.bucket.2.bucket
   key    = join("/", [var.set_permissions_lambda_name, "1.0.0", basename("./${var.set_permissions_lambda_name}.zip")])
   source = "./${var.set_permissions_lambda_name}.zip"
 }
