@@ -8,7 +8,7 @@ from botocore.exceptions import ClientError
 def handler(event, context):
     key = event["Records"][0]["s3"]["object"]["key"]
     source_key = urllib.parse.unquote_plus(key)
-    output_key = source_key.split(".")[0]
+    output_key = source_key[: source_key.rfind(".")]
     print(f"key: ", key, source_key, output_key)
 
     transcoder_params = {

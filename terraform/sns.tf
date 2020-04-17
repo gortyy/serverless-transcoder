@@ -29,3 +29,9 @@ resource "aws_sns_topic_subscription" "transcoded_video_lambda_subscription" {
   protocol  = "lambda"
   endpoint  = aws_lambda_function.set_permissions.arn
 }
+
+resource "aws_sns_topic_subscription" "transcoded_video_lambda_subscription_extract_metadata" {
+  topic_arn = aws_sns_topic.transcoded_video_topic.arn
+  protocol  = "lambda"
+  endpoint  = aws_lambda_function.extract_metadata.arn
+}
