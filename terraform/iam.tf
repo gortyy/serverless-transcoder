@@ -69,27 +69,20 @@ resource "aws_iam_policy" "transcoder" {
             "Effect": "Allow",
             "Action": [
                 "s3:ListBucket",
-                "s3:Get*"
+                "s3:Get*",
+                "s3:Put*",
+                "s3:*MultipartUpload*"
             ],
-            "Resource": "${aws_s3_bucket.bucket.0.arn}"
+            "Resource": "*"
         },
         {
             "Sid": "2",
             "Effect": "Allow",
-            "Action": [
-                "s3:Put*",
-                "s3:*MultipartUpload*"
-            ],
-            "Resource": "${aws_s3_bucket.bucket.1.arn}"
+            "Action": "sns:Publish",
+            "Resource": "*"
         },
         {
             "Sid": "3",
-            "Effect": "Allow",
-            "Action": "sns:Publish",
-            "Resource": "${aws_sns_topic.transcoded_video_topic.arn}"
-        },
-        {
-            "Sid": "4",
             "Effect": "Deny",
             "Action": [
                 "s3:*Delete*",

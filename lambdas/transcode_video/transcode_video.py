@@ -5,6 +5,14 @@ import boto3
 from botocore.exceptions import ClientError
 
 
+def find_pipeline(client: boto3.session.Session.client, name: str):
+    pipelines = client.list_pipelines()["Pipelines"]
+
+    for pipeline in pipelines:
+        if pipeline["Name"] == name:
+            return pipeline["Id"]
+
+
 def handler(event, context):
     key = event["Records"][0]["s3"]["object"]["key"]
     source_key = urllib.parse.unquote_plus(key)
@@ -12,13 +20,7 @@ def handler(event, context):
     print(f"key: ", key, source_key, output_key)
 
     elastic_transcoder = boto3.client("elastictranscoder", "us-east-1")
-
-    pipelines = elastic_transcoder.list_pipelines()["Pipelines"]
-    pipeline_id = None
-
-    for pipeline in pipelines:
-        if pipeline["Name"] == "transcoder_pipeline":
-            pipeline_id = pipeline["Id"]
+    pipeline_id = find_pipeline(elastic_transcoder, "transcoder_pipeline")
 
     if pipeline_id is None:
         raise EnvironmentError("Missing transcoder pipeline")
@@ -39,6 +41,14 @@ def handler(event, context):
             {
                 "Key": f"{output_key}-web-720p.mp4",
                 "PresetId": "1351620000001-100070",
+            },
+            {
+                "Key": f"{output_key}-720p.webm",
+                "PresetId": "1351620000001-100240",
+            },
+            {
+                "Key": f"{output_key}-400k.ts",
+                "PresetId": "1351620000001-200050",
             },
         ],
     }

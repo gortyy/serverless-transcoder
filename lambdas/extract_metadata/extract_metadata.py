@@ -1,4 +1,5 @@
 import json
+import os
 import subprocess as sp
 import urllib
 
@@ -17,7 +18,7 @@ def extract_metadata(local_filename):
     print("Extracting metadata")
     sp.run(
         f"bin/ffprobe -v quiet -print_format json "
-        f"-show_format /tmp/{local_filename}",
+        f"-show_format {local_filename}",
         shell=True,
         check=True,
     )
@@ -25,7 +26,7 @@ def extract_metadata(local_filename):
 
 def save_file_to_filesystem(bucket, key):
     print("Saving to filesystem")
-    local_filename = key.split("/")[-1]
+    local_filename = os.path.jon("/tmp", key.split("/")[-1])
     with open(local_filename, "wb") as f:
         s3.download_fileobj(bucket, key, f)
     extract_metadata(local_filename)
