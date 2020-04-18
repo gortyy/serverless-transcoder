@@ -11,9 +11,21 @@ def handler(event, context):
     output_key = source_key[: source_key.rfind(".")]
     print(f"key: ", key, source_key, output_key)
 
+    elastic_transcoder = boto3.client("elastictranscoder", "us-east-1")
+
+    pipelines = elastic_transcoder.list_pipelines()["Pipelines"]
+    pipeline_id = None
+
+    for pipeline in pipelines:
+        if pipeline["Name"] == "transcoder_pipeline":
+            pipeline_id = pipeline["Id"]
+
+    if pipeline_id is None:
+        raise EnvironmentError("Missing transcoder pipeline")
+
     transcoder_params = {
-        "PipelineId": "1586883367960-0uo4tl",
-        "OutputKeyPrefix": output_key + "/",
+        "PipelineId": pipeline_id,
+        "OutputKeyPrefix": f"{output_key}/",
         "Input": {"Key": source_key},
         "Outputs": [
             {
@@ -31,7 +43,6 @@ def handler(event, context):
         ],
     }
 
-    elastic_transcoder = boto3.client("elastictranscoder", "us-east-1")
     try:
         response = elastic_transcoder.create_job(**transcoder_params)
         return json.dumps({"message": response})

@@ -3,7 +3,6 @@ import subprocess as sp
 import urllib
 
 import boto3
-from botocore.exceptions import ClientError
 
 
 s3 = boto3.client("s3")
@@ -17,7 +16,8 @@ def save_metadata_to_s3(file_name, bucket, key):
 def extract_metadata(local_filename):
     print("Extracting metadata")
     sp.run(
-        f"bin/ffprobe -v quiet -print_format json -show_format /tmp/{local_filename}",
+        f"bin/ffprobe -v quiet -print_format json "
+        f"-show_format /tmp/{local_filename}",
         shell=True,
         check=True,
     )
@@ -41,4 +41,6 @@ def handler(event, context):
     )
 
     local_filename = save_file_to_filesystem(source_bucket, source_key)
-    save_metadata_to_s3(source_bucket, f"{source_key.split(".")[0]}.json")
+    save_metadata_to_s3(
+        local_filename, source_bucket, f"{source_key.split('.')[0]}.json"
+    )
