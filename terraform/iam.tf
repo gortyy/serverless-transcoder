@@ -64,37 +64,43 @@ resource "aws_iam_policy" "transcoder" {
 {
     "Version": "2012-10-17",
     "Statement": [
-      {
-         "Sid":"1",
-         "Effect":"Allow",
-         "Action":[
-            "s3:ListBucket",
-            "s3:Put*",
-            "s3:Get*",
-            "s3:*MultipartUpload*"
-         ],
-         "Resource":"*"
-      },
-      {
-         "Sid":"2",
-         "Effect":"Allow",
-         "Action":"sns:Publish",
-         "Resource":"*"
-      },
-      {
-         "Sid":"3",
-         "Effect":"Deny",
-         "Action":[
-            "s3:*Policy*",
-            "sns:*Permission*",
-            "s3:*Acl*",
-            "sns:*Delete*",
-            "s3:*Delete*",
-            "sns:*Remove*"
-         ],
-         "Resource":"*"
-      }
-   ]
+        {
+            "Sid": "1",
+            "Effect": "Allow",
+            "Action": [
+                "s3:ListBucket",
+                "s3:Get*"
+            ],
+            "Resource": "${aws_s3_bucket.bucket.0.arn}"
+        },
+        {
+            "Sid": "2",
+            "Effect": "Allow",
+            "Action": [
+                "s3:Put*",
+                "s3:*MultipartUpload*"
+            ],
+            "Resource": "${aws_s3_bucket.bucket.1.arn}"
+        },
+        {
+            "Sid": "3",
+            "Effect": "Allow",
+            "Action": "sns:Publish",
+            "Resource": "${aws_sns_topic.transcoded_video_topic.arn}"
+        },
+        {
+            "Sid": "4",
+            "Effect": "Deny",
+            "Action": [
+                "s3:*Delete*",
+                "s3:*Policy*",
+                "sns:*Remove*",
+                "sns:*Delete*",
+                "sns:*Permission*"
+            ],
+            "Resource": "*"
+        }
+    ]
 }
 EOF
 }
