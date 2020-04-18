@@ -48,6 +48,14 @@ variable "set_permissions_lambda_handler" {
   type = string
 }
 
+variable "extract_metadata_lambda_name" {
+  type = string
+}
+
+variable "extract_metadata_lambda_handler" {
+  type = string
+}
+
 # SNS
 variable "sns_emails" {
   type = string

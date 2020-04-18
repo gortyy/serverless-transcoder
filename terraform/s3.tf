@@ -9,12 +9,25 @@ resource "aws_s3_bucket" "bucket" {
   }
 }
 
-resource "aws_s3_bucket_notification" "bucket_notification" {
+resource "aws_s3_bucket_notification" "upload_notification" {
   bucket = aws_s3_bucket.bucket.0.id
 
   lambda_function {
     lambda_function_arn = aws_lambda_function.transcode.arn
     events              = ["s3:ObjectCreated:*"]
+    filter_suffix       = ".mp4"
+  }
+
+  lambda_function {
+    lambda_function_arn = aws_lambda_function.transcode.arn
+    events              = ["s3:ObjectCreated:*"]
+    filter_suffix       = ".avi"
+  }
+
+  lambda_function {
+    lambda_function_arn = aws_lambda_function.transcode.arn
+    events              = ["s3:ObjectCreated:*"]
+    filter_suffix       = ".mov"
   }
 
   depends_on = [aws_lambda_permission.allow_bucket]
