@@ -1,13 +1,15 @@
 import argparse
-import subprocess as sp
 from zipfile import ZipFile
 
+from path import Path
 from python_terraform import Terraform, IsFlagged
 
 
 def zip_lambda_function(src, dst):
-    with ZipFile(dst, "w") as lambda_zip:
-        lambda_zip.write(src)
+    dst = Path(dst).abspath()
+    with Path(src), ZipFile(dst, "w") as lambda_zip:
+        for file in Path(".").walk():
+            lambda_zip.write(file)
 
 
 def parse_args():
@@ -33,20 +35,17 @@ if __name__ == "__main__":
             name = lf.split("/")[-1].split(".")[0]
             zip_lambda_function(lf, f"{args.workdir}/{name}.zip")
 
-        return_code, stdout, stderr = tf.apply(
+        tf.apply(
             no_color=IsFlagged,
             refresh=False,
             var_file=args.tfvars,
             skip_plan=True,
+            capture_output=False,
         )
 
     elif args.destroy:
-        return_code, stdout, stderr = tf.destroy(
-            no_color=IsFlagged, var_file=args.tfvars,
+        tf.destroy(
+            no_color=IsFlagged, var_file=args.tfvars, capture_output=False
         )
     else:
         raise ValueError("Action not specified.")
-
-    print(return_code)
-    print(stdout)
-    print(stderr)
