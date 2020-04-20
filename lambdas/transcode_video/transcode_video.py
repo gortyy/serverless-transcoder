@@ -31,6 +31,12 @@ def handler(event, context):
     if pipeline_id is None:
         raise EnvironmentError("Missing transcoder pipeline")
 
+    elastic_transcoder = boto3.client("elastictranscoder", "us-east-1")
+    pipeline_id = find_pipeline(elastic_transcoder, "transcoder_pipeline")
+
+    if pipeline_id is None:
+        raise EnvironmentError("Missing transcoder pipeline")
+
     transcoder_params = {
         "PipelineId": pipeline_id,
         "OutputKeyPrefix": f"{output_key}/",
