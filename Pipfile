@@ -9,6 +9,7 @@ botocore = "*"
 flake8 = "*"
 pre-commit = "*"
 pytest = "*"
+black = "*"
 
 [packages]
 path = "*"
@@ -16,3 +17,6 @@ python-terraform = "*"
 
 [requires]
 python_version = "3.8"
+
+[pipenv]
+allow_prereleases = true

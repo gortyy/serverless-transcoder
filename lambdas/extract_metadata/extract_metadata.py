@@ -2,6 +2,7 @@ import json
 import os
 import subprocess as sp
 import urllib
+from typing import Tuple
 
 import boto3
 
@@ -33,13 +34,19 @@ def save_file_to_filesystem(bucket, key):
     return local_filename
 
 
-def handler(event, context):
+def parse_event(event: dict) -> Tuple[str, str]:
     message = json.loads(event["Records"][0]["Sns"]["Message"])
     s3_info = message["Records"][0]["s3"]
     source_bucket = s3_info["bucket"]["name"]
     source_key = urllib.parse.unquote_plus(
         s3_info["object"]["key"].replace("+", " ")
     )
+
+    return (source_bucket, source_key)
+
+
+def handler(event, context):
+    source_bucket, source_key = parse_event(event)
 
     local_filename = save_file_to_filesystem(source_bucket, source_key)
     save_metadata_to_s3(

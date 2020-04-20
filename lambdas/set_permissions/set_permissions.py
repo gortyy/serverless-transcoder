@@ -1,13 +1,20 @@
 import json
+from typing import Tuple
 
 import boto3
 from botocore.exceptions import ClientError
 
 
-def handler(event, context):
+def parse_event(event: dict) -> Tuple[str, str]:
     message = event["Records"][0]
     source_bucket = message["s3"]["bucket"]["name"]
     source_key = message["s3"]["object"]["key"].replace("+", " ")
+
+    return (source_bucket, source_key)
+
+
+def handler(event, context):
+    source_key, source_bucket = parse_event(event)
 
     s3 = boto3.resource("s3")
     try:

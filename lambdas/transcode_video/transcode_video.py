@@ -1,5 +1,6 @@
 import json
 import urllib
+from typing import Tuple
 
 import boto3
 from botocore.exceptions import ClientError
@@ -13,11 +14,22 @@ def find_pipeline(client: boto3.session.Session.client, name: str):
             return pipeline["Id"]
 
 
-def handler(event, context):
+def parse_event(event: dict) -> Tuple[str, str]:
     key = event["Records"][0]["s3"]["object"]["key"]
     source_key = urllib.parse.unquote_plus(key)
     output_key = source_key[: source_key.rfind(".")]
-    print(f"key: ", key, source_key, output_key)
+
+    return (source_key, output_key)
+
+
+def handler(event, context):
+    source_key, output_key = parse_event(event)
+
+    elastic_transcoder = boto3.client("elastictranscoder", "us-east-1")
+    pipeline_id = find_pipeline(elastic_transcoder, "transcoder_pipeline")
+
+    if pipeline_id is None:
+        raise EnvironmentError("Missing transcoder pipeline")
 
     elastic_transcoder = boto3.client("elastictranscoder", "us-east-1")
     pipeline_id = find_pipeline(elastic_transcoder, "transcoder_pipeline")
